@@ -78,3 +78,23 @@ License: Creative Commons Zero (CC0)
 운석 무기 그림 (예전 '날아오는 가구'의 table.png / chair.png 를 대체. 두 파일은 삭제함):
   rock.png  = Kenney "Roguelike/RPG Pack" (CC0) roguelikeSheet_transparent.png 열 54, 행 21 (회색 바위. 여백을 잘라 16x16 가운데 정렬)
   rock2.png = 같은 시트 열 56, 행 21
+
+
+==========================================================================
+야근 탈출 개편 (2026-09-29 ~ 09-30): assets/office 폴더의 그림
+==========================================================================
+assets/office 폴더의 그림 117장 (PNG 98장 + 이야기 그림 JPG 19장) 은 AI 이미지 생성으로 만들었습니다.
+  (PNG 90장 중 27장은 움직임 프레임 <이름>_walk2~4.png: 마젠타 배경 4칸 시트를 sprite-gen(Apache-2.0, https://github.com/aldegad/sprite-gen) 의 cutout 으로 배경을 지우고 tools/make_walk_frames.py 로 잘랐습니다)
+  도구  : ChatGPT (gpt-image), 소유자 계정의 구독으로 생성
+  화풍  : 굵은 검은 외곽선 + 단색 채색의 스티커풍
+  규칙  : 글자·상표·로고·실존 인물을 넣지 않음
+  지시문: docs/office-reskin/02-image-prompts.md
+  후처리: tools/process_sprites.py (둘레 여백 제거, 192x192 로 축소, 보스는 좌우 뒤집기, 이야기 그림은 960x640 JPG)
+
+폴더 구성:
+  assets/office/        게임에서 쓰는 그림
+  assets/office/_src/   생성된 원본 (1254x1254 등). 게임에서 쓰지 않음. 배포하지 않음
+  assets/office/_old/   채택하지 않은 초안. 게임에서 쓰지 않음. 배포하지 않음
+
+게임 안의 이름과 파일의 대응은 index.html 의 OFFICE_SPRITES 표에 적혀 있습니다.
+assets 폴더 바로 아래의 Kenney 그림은 지금 게임에 나오지 않는 무기 15개가 쓰던 것으로, 되살릴 때를 위해 남겨 두었습니다.
