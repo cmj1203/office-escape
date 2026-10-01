@@ -289,3 +289,15 @@ four edges. Dark and muted so that characters drawn on top stand out. Square ima
 | 1층 | prop_plant.png | 큰 회색 화분에 넓은 초록 잎 |
 
 후처리: `tools/process_sprites.py` 가 `prop_` 이름은 정사각형으로 채우지 않고 비율 그대로 긴 쪽 384픽셀로 줄인다 (게임이 `FLOORS` 표의 w × h 로 그림).
+
+## 19. 일시정지 버튼과 계단 휴대폰 장면 (2026-10-01 추가)
+
+| 쓰는 곳 | 파일 | 주제 문장 (요약) |
+|---|---|---|
+| 화면 왼쪽 위, ? 버튼 옆의 일시정지 버튼 | pause.png | 도움말 단추(help.png)와 같은 노란 포스트잇에 굵은 검은 일시정지 막대 두 개. 스프라이트 공통 문장을 앞에 붙임 |
+| 계단 장면의 휴대폰 | phone_hand.png | 김 과장의 눈으로 본 왼손(걷어 올린 흰 셔츠 소매)이 큰 검은 스마트폰을 세로로 든 모습. 화면은 글자 없는 흰 단색 (게임이 그 위에 알림과 문자를 씀) |
+| 휴대폰 화면의 딸 사진 | avatar_kid.png | 새로 만들지 않았다. 굿엔딩 그림 story_home_good 에서 딸 얼굴을 오려 192픽셀로 줄임 |
+
+후처리: `tools/process_sprites.py` 가 `phone_` 이름은 정사각형으로 채우지 않고 비율 그대로 긴 쪽 768픽셀로 줄인다 (화면에 크게 나오므로). phone_hand.png 는 654 × 768.
+
+쓰지 않게 된 그림: 계단 이야기 그림 story_stair1~4 (14장) 는 휴대폰 장면으로 바뀌어 `assets/office/_old/` 로 옮겼다.
