@@ -21,6 +21,8 @@ CUTIN_SIZE = 640
 FACES_LEFT_PREFIXES = ("boss_",)
 # 층 전용 물건 (prop_*): 책상·회의 탁자처럼 옆으로 긴 것이 많아서 정사각형으로 채우지 않고 비율을 그대로 둔다. 긴 쪽이 이 크기
 PROP_SIZE = 384
+# 컷신 위에 크게 뜨는 휴대폰 그림 (phone_*): 물건처럼 비율 그대로, 긴 쪽이 이 크기
+PHONE_SIZE = 768
 
 
 def process_sprite(image: Image.Image, size: int = SPRITE_SIZE) -> Image.Image:
@@ -35,13 +37,13 @@ def process_sprite(image: Image.Image, size: int = SPRITE_SIZE) -> Image.Image:
     return square.resize((size, size), Image.LANCZOS)
 
 
-def process_prop(image: Image.Image) -> Image.Image:
+def process_prop(image: Image.Image, size: int = PROP_SIZE) -> Image.Image:
     alpha = image.getchannel("A").point(lambda a: 255 if a > ALPHA_VISIBLE else 0)
     box = alpha.getbbox()
     if box is None:
         raise ValueError("그림에 보이는 부분이 없다")
     cropped = image.crop(box)
-    scale = PROP_SIZE / max(cropped.size)
+    scale = size / max(cropped.size)
     return cropped.resize((round(cropped.width * scale), round(cropped.height * scale)), Image.LANCZOS)
 
 
@@ -55,8 +57,8 @@ def main(names: list[str]) -> int:
             result.save(target, quality=STORY_QUALITY, optimize=True)
             print(f"{name}: {image.size[0]}x{image.size[1]} -> {target.name} {result.size[0]}x{result.size[1]}, {target.stat().st_size // 1024}KB")
             continue
-        if name.startswith("prop_"):
-            result = process_prop(image.convert("RGBA"))
+        if name.startswith(("prop_", "phone_")):
+            result = process_prop(image.convert("RGBA"), PHONE_SIZE if name.startswith("phone_") else PROP_SIZE)
             target = OFFICE / name
             result.save(target, optimize=True)
             print(f"{name}: {image.size[0]}x{image.size[1]} -> {result.size[0]}x{result.size[1]}, {target.stat().st_size // 1024}KB")
