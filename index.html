@@ -2,13 +2,13 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>아빠는 퇴근 중</title>
+  <title>퇴근하겠습니다</title>
   <style>
     /* 글꼴: 제목·버튼·게임 안 글자 = Jua (Google Fonts, 둥근 글씨). 못 불러오면 기본 글꼴로 대체됨
        @import 는 반드시 스타일 맨 위에 있어야 함 (중간에 있으면 브라우저가 무시해서 글꼴이 안 불러와짐) */
-    @import url("https://fonts.googleapis.com/css2?family=Jua&display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Jua&display=swap");
 
-    /* ===== 색과 글꼴 (아빠는 퇴근 중: 캐릭터 그림처럼 "굵은 검은 테두리 + 단색 면"의 스티커풍) =====
+    /* ===== 색과 글꼴 (퇴근하겠습니다: 캐릭터 그림처럼 "굵은 검은 테두리 + 단색 면"의 스티커풍) =====
        색을 바꾸고 싶으면 여기 값만 고치면 모든 창·버튼에 한꺼번에 적용됨 */
     :root {
       --ink: #161616;            /* 테두리·글자 (거의 검정) */
@@ -23,6 +23,7 @@
       --muted: #5c5c5c;          /* 설명 글자 */
       --shadow: rgba(0, 0, 0, 0.85);
       --title-font: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      --logo-font: "Do Hyeon", "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;   /* 시작 화면 큰 제목만: 도현체 (굵고 반듯한 글씨. 글꼴 5개를 비교해 사용자가 고름) */
       --body-font: "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
     }
 
@@ -211,13 +212,12 @@
     /* 제목: 노란 글자에 굵은 검은 테두리 (스티커 글씨). paint-order 로 테두리를 글자 뒤에 깔아서 글자가 가늘어지지 않게 함 */
     .title-head { position: absolute; top: 5.5cqw; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; }
     .title-text {
-      margin: 0; font-weight: 400; font-size: 9.5cqw; line-height: 1; letter-spacing: 0.4cqw;
+      margin: 0; font-family: var(--logo-font); font-weight: 400; font-size: 9.5cqw; line-height: 1; letter-spacing: 0.4cqw;
       color: var(--yellow);
       -webkit-text-stroke: 1cqw var(--ink);
       paint-order: stroke fill;
       text-shadow: 0.55cqw 0.55cqw 0 var(--ink);
     }
-    .title-sub { margin: 1.4cqw 0 0; font-size: 1.9cqw; color: #fff; text-shadow: 0.18cqw 0.18cqw 0 #000; }
 
     /* 버튼 묶음: 화면 아래쪽 (버튼 2개 + Enter 안내). 스티커풍 버튼 (굵은 테두리, 둥근 모서리, 딱딱한 그림자) */
     .title-menu { position: absolute; bottom: 4.5cqw; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 1cqw; }
@@ -362,8 +362,7 @@
 
     <div id="titleOverlay">
       <div class="title-head">
-        <h1 class="title-text">아빠는 퇴근 중</h1>
-        <p class="title-sub">오늘은 딸의 생일이다</p>
+        <h1 class="title-text">퇴근하겠습니다</h1>
       </div>
 
       <div class="title-menu">
