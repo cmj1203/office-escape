@@ -83,9 +83,8 @@ License: Creative Commons Zero (CC0)
 ==========================================================================
 야근 탈출 개편 (2026-09-29 ~ 10-01): assets/office 폴더의 그림
 ==========================================================================
-assets/office 폴더의 그림 116장 (PNG 101장 + 이야기 그림 JPG 15장) 은 AI 이미지 생성으로 만들었습니다.
-  (avatar_kid.png 는 새로 그리지 않고 이야기 그림 story_home_good 에서 딸 얼굴을 오려 낸 것입니다)
-  (PNG 101장 중 27장은 움직임 프레임 <이름>_walk2~4.png: 마젠타 배경 4칸 시트를 sprite-gen(Apache-2.0, https://github.com/aldegad/sprite-gen) 의 cutout 으로 배경을 지우고 tools/make_walk_frames.py 로 잘랐습니다)
+assets/office 폴더의 그림 117장 (PNG 103장 + 이야기 그림 JPG 14장) 은 AI 이미지 생성으로 만들었습니다.
+  (PNG 103장 중 27장은 움직임 프레임 <이름>_walk2~4.png: 마젠타 배경 4칸 시트를 sprite-gen(Apache-2.0, https://github.com/aldegad/sprite-gen) 의 cutout 으로 배경을 지우고 tools/make_walk_frames.py 로 잘랐습니다)
   도구  : ChatGPT (gpt-image), 소유자 계정의 구독으로 생성
   화풍  : 굵은 검은 외곽선 + 단색 채색의 스티커풍
   규칙  : 글자·상표·로고·실존 인물을 넣지 않음

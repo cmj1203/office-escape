@@ -294,6 +294,9 @@
     .bi-warning { display: inline-block; font-size: 1.8cqw; color: var(--ink); background: var(--yellow); padding: 0.2cqw 1.2cqw; border-radius: 0.6cqw; letter-spacing: 0.3cqw; }
     .bi-name { font-size: 4.8cqw; color: var(--yellow); -webkit-text-stroke: 0.6cqw var(--ink); paint-order: stroke fill; margin-top: 0.8cqw; word-break: keep-all; }
     .bi-line { font-size: 2.3cqw; color: #fff; margin-top: 0.6cqw; word-break: keep-all; }
+    .bi-reply { font-size: 2.3cqw; color: #fff; margin-top: 1cqw; word-break: keep-all; animation: bi-reply 0.35s ease-out var(--bi-reply-delay, 1.2s) both; }   /* 김 과장의 대답: 보스 대사보다 늦게 들어옴 */
+    @keyframes bi-reply { from { opacity: 0; transform: translateX(-3cqw); } to { opacity: 1; transform: none; } }
+    #bossIntro.outro .bi-warning { background: #fff; }   /* 보스가 쓰러질 때("보스 퇴근")는 흰 딱지 */
 
     /* =====================================================================
        컷신 (#cutscene): 그림 한 장 + 글 몇 줄. 글은 한 줄씩 차례로 나타남 (간격은 자바스크립트의 CUTSCENE_LINE_DELAY)
@@ -347,6 +350,7 @@
     .ph-bubble { align-self: flex-start; max-width: 88%; padding: 0.3cqw 0.6cqw; background: #eef0f3; border: 0.15cqw solid var(--ink); border-radius: 0.9cqw; font-size: 1.1cqw; opacity: 0; animation: cs-line 0.4s ease-out forwards; }
     .ph-bubble.me { align-self: flex-end; background: var(--yellow); }
     .ph-bubble.missed { background: #fff; color: #d62828; font-weight: 700; }
+    .ph-from { display: block; font-size: 0.85cqw; line-height: 1.2; color: #666; }   /* 단톡방 말풍선 위의 보낸 사람 이름 */
   </style>
 </head>
 <body>
@@ -360,14 +364,15 @@
 
     <!-- 시작 화면: 게임을 켜면 가장 먼저 보임. 배경(던전·몬스터·기사)은 캔버스가 그리고, 이 글자·버튼은 그 위에 얹힘
          '게임 시작'(또는 Enter) → 게임 시작.  '게임 설명' → 제목·버튼 자리에 설명판이 대신 나옴 (intro 클래스) -->
-    <!-- 보스 등장 연출: 층 보스나 부장님이 나타나는 순간 잠깐 게임을 멈추고 큰 그림·이름·대사를 보여 줌 (Enter·Space·Esc·클릭으로 건너뜀) -->
+    <!-- 보스 연출: 층 보스나 부장님이 나타날 때(보스 등장)와 층 보스가 쓰러질 때(보스 퇴근) 잠깐 게임을 멈추고 큰 그림·이름·대사를 보여 줌 (Enter·Space·Esc·클릭으로 건너뜀) -->
     <div id="bossIntro">
       <div class="bi-band"></div>
       <img id="bossIntroImg" class="bi-portrait" src="" alt="">
       <div class="bi-text">
-        <div class="bi-warning">보스 등장</div>
+        <div id="bossIntroTag" class="bi-warning">보스 등장</div>
         <div id="bossIntroName" class="bi-name"></div>
         <div id="bossIntroLine" class="bi-line"></div>
+        <div id="bossIntroReply" class="bi-reply"></div>   <!-- 김 과장의 대답 (보스 대사보다 조금 늦게 들어옴. 쓰러질 때는 비어 있음) -->
       </div>
     </div>
 
@@ -449,7 +454,7 @@
   <!-- 클리어 창 (마지막 보스를 잡으면 나타남) -->
   <div id="clearBox" class="popup">
     <h1>퇴근!</h1>
-    <!-- 그림은 넣지 않음: 바로 앞 결말 컷신의 마지막 장면(story_home)이 같은 그림이라 두 번 보이지 않게 -->
+    <!-- 그림은 넣지 않음: 바로 앞 결말 컷신의 마지막 장면(story_home_chicken / story_home_cold)이 같은 그림이라 두 번 보이지 않게 -->
     <p id="clearText"></p>
     <button id="clearRestart" class="ok-button">다시 시작</button>
   </div>
@@ -533,6 +538,8 @@
     const bossIntroImg = document.getElementById("bossIntroImg");
     const bossIntroName = document.getElementById("bossIntroName");
     const bossIntroLine = document.getElementById("bossIntroLine");
+    const bossIntroTag = document.getElementById("bossIntroTag");
+    const bossIntroReply = document.getElementById("bossIntroReply");
     const cutsceneBox = document.getElementById("cutscene");
     const cutsceneFrame = document.getElementById("cutsceneFrame");
     const cutsceneImg = document.getElementById("cutsceneImg");
@@ -699,7 +706,7 @@
       return SPRITES[key].ready ? key : base;
     }
     // 그림 파일 주소 뒤에 붙는 버전 표시. 그림 파일을 바꿨으면 이 값을 바꿀 것 (안 바꾸면 크롬이 예전에 받아 둔 그림을 그대로 씀)
-    const ASSET_VERSION = "20261001a";
+    const ASSET_VERSION = "20261001b";
     function assetUrl(path) { return `assets/${path}?v=${ASSET_VERSION}`; }   // "office/player.png" → "assets/office/player.png?v=..."
     for (const img of document.querySelectorAll('img[src^="assets/"]')) img.src = assetUrl(img.getAttribute("src").slice("assets/".length));   // HTML 에 직접 적힌 그림도 같은 버전으로
     // 그림 이름 → 파일 주소 (새 그림이 있으면 새 그림, 없으면 예전 그림). 게임 화면과 카드·도움말 아이콘이 같이 씀
@@ -1895,7 +1902,7 @@
     //     hp 는 기본 체력. 실제 체력 = (hp + BOSS_HP_PER_LEVEL × 플레이어 레벨 × FLOOR_BOSS_LEVEL_SHARE) × DIFFICULTY
     //       처음엔 자동 플레이 기준 약 40초에 잡히게 맞췄고(10/140/320/450), 보스가 공격을 안 하게 되면서 2배로 올림. 너무 쉽거나 어려우면 hp 만 고치면 됨
     //     shots / shotInterval / bulletDamage : 한 번에 쏘는 탄환 수 / 쏘는 간격(초) / 탄환 피해
-    //     summon : 한 번에 부르는 부하 수     line / defeat : 나타날 때 / 쓰러질 때 하는 말
+    //     summon : 한 번에 부르는 부하 수     line / reply / defeat : 나타날 때 하는 말 / 그때 김 과장의 대답 / 쓰러질 때 하는 말 ("보스 퇴근" 연출로 보여 줌)
     //     cutin  : 등장 연출에 쓰는 큰 그림 (assets/office 폴더, 확장자 .png 제외)
     //   바닥 그림은 위쪽 FLOOR_TILES 에 같은 순서로 적혀 있음
     // =====================================================================
@@ -1907,28 +1914,29 @@
     const STAIRS_OPEN_DELAY = 1.5;     // 비상계단 문이 생긴 뒤 들어갈 수 있게 되기까지의 시간 (초). 상자를 주울 틈을 줌
     const FLOOR_FADE_TIME = 1.2;         // 층을 옮길 때 화면이 어두워졌다 밝아지는 데 걸리는 시간 (초)
     const CLOCK_START_HOUR = 18;         // 게임 속 시계가 시작하는 시각 (오후 6시)
-    const CLOCK_END_HOUR = 23;           // 부장님이 나타나는 시각 (밤 11시. 딸의 생일이 끝나기 한 시간 전). 층이 5개라 한 층에 한 시간씩 흐름
+    const CLOCK_END_HOUR = 23;           // 부장님이 나타나는 시각 (밤 11시. 김 과장이 보려는 결승전이 시작되기 한 시간 전). 층이 5개라 한 층에 한 시간씩 흐름
     const BOSS_CUTIN = "cutin_bujang";                     // 부장님 등장 연출에 쓰는 큰 그림 (assets/office 폴더, 확장자 .png 제외)
     const BOSS_LINE = "김 과장, 한잔하고 가지?";          // 부장님이 나타날 때 하는 말
-    const BOSS_DEFEAT_LINE = "들어가 봐. 뛰어.";            // 부장님이 쓰러질 때 하는 말 (결말 컷신의 첫 장면에 나옴)
+    const BOSS_REPLY = "부장님. 퇴근하겠습니다.";          // 그때 김 과장의 대답 (게임 제목. 12년 만에 처음 하는 말)
+    const BOSS_DEFEAT_LINE = "나도 퇴근하겠네!";            // 부장님이 쓰러질 때 하는 말 (결말 컷신의 첫 장면에 나옴)
     const FLOORS = [
-      { label: "5F 사무실", arrive: "퇴근 시간이다.", main: "bat", enemies: ["bat"], xpMul: 1, bossLevels: 4,
+      { label: "5F 사무실", arrive: "아무도 일어나지 않는다. 다들 모니터만 본다.", main: "bat", enemies: ["bat"], xpMul: 1, bossLevels: 4,
         rule: null, ruleText: "책상은 적도 막는다. 책상 사이로 몰아서 잡자.", props: [{ sprite: "prop_desk", w: 124, h: 101, count: 8, row: 2 }],
         boss: { name: "옆 팀 팀장", shape: "boss_5f", cutin: "cutin_5f", color: "#e2c9a0", r: 28, speed: 75, hp: 20, damage: 12, xp: 15, shots: 3, shotInterval: 2.6, bulletDamage: 8, summon: 3,
-                line: "김 과장님, 이것만 좀 봐 주세요.", defeat: "내일 다시 올게요." } },
-      { label: "4F 회의실", arrive: "불이 아직 켜져 있다.", main: "spider", enemies: ["spider", "bat"], xpMul: 1, bossLevels: 4,
+                line: "김 과장님, 이것만 좀 봐 주세요.", reply: "결승전이 있습니다.", defeat: "아, 가세요? ...그럼 저도 가도 되겠네요!" } },
+      { label: "4F 회의실", arrive: "회의 중이다. 3시간째.", main: "spider", enemies: ["spider", "bat"], xpMul: 1, bossLevels: 4,
         rule: "meeting", ruleText: "\"회의 중\" 구역에 들어가면 느려진다.", props: [{ sprite: "prop_table", w: 220, h: 113, count: 9 }],
         boss: { name: "끝나지 않는 주간 회의", shape: "boss_4f", cutin: "cutin_4f", color: "#f0f0f0", r: 30, speed: 60, hp: 280, damage: 14, xp: 25, shots: 5, shotInterval: 2.4, bulletDamage: 10, summon: 4,
-                line: "그럼 다음 안건으로 넘어가겠습니다.", defeat: "회의록은 김 과장님이 정리해 주세요." } },
-      { label: "3F 탕비실", arrive: "커피 냄새가 난다.", main: "ghost", enemies: ["ghost", "spider", "bat"], xpMul: 1, bossLevels: 5,
+                line: "그럼 다음 안건으로 넘어가겠습니다.", reply: "다음 안건: 퇴근.", defeat: "안건 12번, 퇴근. 만장일치로 통과되었습니다." } },
+      { label: "3F 탕비실", arrive: "커피 냄새가 난다. 오늘 다섯 번째 커피다.", main: "ghost", enemies: ["ghost", "spider", "bat"], xpMul: 1, bossLevels: 5,
         rule: "coffee", ruleText: "커피 머신 옆 믹스커피를 마시면 잠깐 빨라진다.", props: [{ sprite: "prop_coffee", w: 75, h: 124, count: 8, kind: "coffee" }],
         boss: { name: "인사팀장", shape: "boss_3f", cutin: "cutin_3f", color: "#2f4b7c", r: 28, speed: 95, hp: 640, damage: 16, xp: 40, shots: 5, shotInterval: 2.0, bulletDamage: 12, summon: 4,
-                line: "면담 일정이 잡혀 있습니다.", defeat: "평가에 반영하겠습니다." } },
-      { label: "2F 총무팀", arrive: "전화가 울린다.", main: "crab", enemies: ["crab", "cyclops", "ghost"], xpMul: 2, bossLevels: 5,
+                line: "면담 일정이 잡혀 있습니다.", reply: "내일 오전 9시에 뵙겠습니다.", defeat: "...사실 저도 6시에 가고 싶었어요. 평가에 '용기 있음'이라고 적을게요." } },
+      { label: "2F 총무팀", arrive: "전화가 울린다. 받지 않았다.", main: "crab", enemies: ["crab", "cyclops", "ghost"], xpMul: 2, bossLevels: 5,
         rule: "phone", ruleText: "전화벨이 울리면 전화기 떼가 몰려온다. 복합기 뒤로 피하자.",
         props: [{ sprite: "prop_copier", w: 106, h: 112, count: 6 }, { sprite: "prop_cabinet", w: 76, h: 110, count: 4, row: 3 }],
         boss: { name: "감사팀장", shape: "boss_2f", cutin: "cutin_2f", color: "#444444", r: 30, speed: 105, hp: 900, damage: 20, xp: 60, shots: 7, shotInterval: 1.9, bulletDamage: 13, summon: 4,
-                line: "영수증이 하나 빕니다.", defeat: "다음 분기에 뵙죠." } },
+                line: "영수증이 하나 빕니다.", reply: "제 지갑엔 없습니다.", defeat: "...아, 제 지갑에 있네. 퇴근하세요." } },
       // mainShare: 주력 몬스터 비율의 최댓값. 적지 않으면 NEW_ENEMY_SHARE_MAX (70%). 1층은 다섯 종류가 고르게 나오게 20%
       { label: "1F 로비", arrive: "누군가 기다리고 있다.", main: "cyclops", enemies: ["cyclops", "crab", "ghost", "spider", "bat"], xpMul: 2, mainShare: 0.2, bossLevels: 8,   // 마지막 싸움 전에 더 키우도록 5 → 8 (2026-10-01 사용자 요청)
         rule: "dark", ruleText: "불이 꺼져 있다. 부장님이 오면 켜진다.",
@@ -2445,6 +2453,7 @@
       boss.boss = true;
       boss.name = def.name;
       boss.defeatLine = def.defeat;
+      boss.cutin = def.cutin;
       boss.hp = Math.round((def.hp + BOSS_HP_PER_LEVEL * player.level * FLOOR_BOSS_LEVEL_SHARE) * DIFFICULTY); boss.maxHp = boss.hp;
       boss.speed = def.speed; boss.damage = Math.round(def.damage * DIFFICULTY); boss.xp = def.xp;
       boss.shots = def.shots; boss.shotInterval = def.shotInterval; boss.bulletDamage = def.bulletDamage; boss.summon = def.summon;
@@ -2452,7 +2461,7 @@
       enemies.push(boss);
       spawnParticles(x, y, "#9b5de5", 30, 260);
       if (SHOW_BANNER) banner = { text: `${def.name}: "${def.line}"`, life: BANNER_TIME + 1.5 };
-      showBossIntro(def.name, def.line, def.cutin);
+      showBossIntro(def.name, def.line, def.cutin, def.reply);
       return boss;
     }
 
@@ -2479,7 +2488,8 @@
       };
       pushOutOfProps(stairs);                 // 물건 속에 놓이면 바깥으로 (못 들어가는 문이 생기지 않게)
       meetingZones = [];
-      if (SHOW_BANNER) banner = { text: `${e.name}: "${e.defeatLine}"  비상계단 문이 열렸다!`, life: BANNER_TIME + 2 };
+      if (SHOW_BANNER) banner = { text: "비상계단 문이 열렸다!", life: BANNER_TIME + 2 };   // 아래 연출이 끝난 뒤에 보임
+      showBossIntro(e.name, e.defeatLine, e.cutin, "", true);   // "보스 퇴근" 연출: 쓰러질 때 대사를 큰 화면으로
     }
 
     // 계단으로 아래층에 내려가기: 바닥에 남은 것은 두고 가고, 맵 한가운데에서 다시 시작
@@ -2504,7 +2514,7 @@
     // ---------------------------------------------------------------------
     // 층별 특징: 층 전용 물건 놓기·막기, 층마다 규칙 하나 (값은 2-3-2, 층별 설정은 FLOORS 표의 rule / props)
     // ---------------------------------------------------------------------
-    // 층에 도착했을 때 안내 문구: "4F 회의실. 불이 아직 켜져 있다.  "회의 중" 구역에 들어가면 느려진다."
+    // 층에 도착했을 때 안내 문구: "4F 회의실. 회의 중이다. 3시간째.  "회의 중" 구역에 들어가면 느려진다."
     function floorArrivalBanner() {
       const f = currentFloor();
       return { text: `${f.label}. ${f.arrive}  ${f.ruleText}`, life: BANNER_TIME + 3 };
@@ -2657,7 +2667,7 @@
       boss.speed = BOSS_TYPE.speed; boss.damage = Math.round(BOSS_TYPE.damage * DIFFICULTY); boss.xp = 0;
       enemies.push(boss);
       spawnParticles(x, y, "#9b5de5", 30, 260);
-      showBossIntro(BOSS_TYPE.name, BOSS_LINE, BOSS_CUTIN);
+      showBossIntro(BOSS_TYPE.name, BOSS_LINE, BOSS_CUTIN, BOSS_REPLY);
       return boss;
     }
 
@@ -4398,7 +4408,7 @@
       state = "gameover";
       gameoverImg.src = assetUrl(`office/${scene.panels[scene.panels.length - 1].img}.jpg`);
       resultText.innerHTML =
-        `새벽 2시. 문자가 와 있었다.<br>"아빠 나 먼저 잘게. 사랑해."<br><small>${clockText()} · ${currentFloor().label} · 버틴 시간 ${formatTime(stats.time)} · 처치 ${stats.kills}</small>`;
+        `새벽 2시. 경기는 끝났다.<br>치킨은 문 앞에서 식어 있었다.<br><small>${clockText()} · ${currentFloor().label} · 버틴 시간 ${formatTime(stats.time)} · 처치 ${stats.kills}</small>`;
       gameoverBox.style.display = "flex";
     }
 
@@ -4420,7 +4430,7 @@
     function showClearResult() {
       state = "clear";
       const good = isGoodEnding();
-      const line = good ? `"생일 축하해. 아빠 왔어."` : `"생일 축하해. 늦어서 미안."`;
+      const line = good ? "퇴근 완료. 치킨이 따뜻할 때." : "퇴근 완료. 치킨은 식었지만.";
       const grade = good ? `굿엔딩 (${formatTime(GOOD_ENDING_TIME)} 안에 퇴근)` : `노말엔딩 (${formatTime(GOOD_ENDING_TIME)} 안에 퇴근하면 굿엔딩)`;
       clearText.innerHTML = `${line}<br><small>${grade}<br>걸린 시간 ${formatTime(stats.time)} · 처치 ${stats.kills} · Lv.${player.level}</small>`;
       clearBox.style.display = "flex";
@@ -4677,11 +4687,10 @@
     const STAIRS_WALK_ZOOM_TO = 1.35;                 // 다 내려갔을 때 그림 배율 (아래층 문에 다가간 느낌)
     const STAIRS_WALK_FOCUS = { x: 44, y: 24 };       // 다가가는 곳: 그림 속 아래층 문의 위치 (그림 크기의 %)
     // --- 계단 장면의 휴대폰 (phone): 몇 걸음 내려가면 진동이 오고, 화면을 누르면 휴대폰을 꺼내 문자를 봄 ---
-    //   ring = 진동이 올 때 아래에 뜨는 글,  notice = 휴대폰 알림 글,  chat = 문자 목록 ({ text } = 딸이 보낸 것, me: true = 김 과장이 보낸 것, missed: true = 부재중 전화)
+    //   from = 보낸 곳 (휴대폰 화면 위에 보이는 이름),  avatar = 그 사진 (assets/office 의 그림 이름, 확장자 .png 제외)
+    //   ring = 진동이 올 때 아래에 뜨는 글,  notice = 휴대폰 알림 글,  chat = 문자 목록 ({ text } = 상대가 보낸 것 (단톡방이면 from = 보낸 사람), me: true = 김 과장이 보낸 것, missed: true = 부재중 전화)
     //   after = 휴대폰을 넣은 뒤 아래에 뜨는 글 (없으면 처음 글)
     const STAIRS_PHONE_STEP = 3;                      // 몇 걸음째에 휴대폰이 울리는지 (STAIRS_WALK_STEPS 걸음 중)
-    const PHONE_CONTACT = "우리 딸";                  // 문자를 보낸 사람 (휴대폰 화면 위에 보이는 이름)
-    const PHONE_AVATAR = "office/avatar_kid.png";     // 그 사람 사진 (굿엔딩 그림에서 딸 얼굴만 오려 둔 것)
     const PHONE_BUBBLE_DELAY = 0.7;                   // 문자가 하나씩 나타나는 간격 (초)
     const PHONE_OPEN_LABEL = "휴대폰 보기 (Enter)";   // 진동이 오는 동안 버튼 글자
     const PHONE_CLOSE_LABEL = "휴대폰 넣기 (Enter)";  // 문자를 보는 동안 버튼 글자
@@ -4693,33 +4702,38 @@
     const PHONE_BUZZ_PITCH = 150;                     // 진동 모터 소리 높이 (Hz). 낮을수록 둔탁함
     const PHONE_BUZZ_RATTLE = 32;                     // 덜덜 떨리는 빠르기 (1초에 몇 번)
     const PHONE_BUZZ_VOLUME = 0.25;                   // 소리 크기 (0~1)
-    //   이야기: 오후 6시, 퇴근할 시간. 오늘은 딸의 여섯 번째 생일이라 김 과장은 꼭 집에 가야 한다
+    //   이야기: 야근하라는 사람은 없는데 아무도 먼저 안 가는 회사. 오늘 밤 12시 결승전(치킨 예약)을 보려고 김 과장이 12년 만에 처음 "퇴근하겠습니다"를 말하러 간다
     const CUTSCENES = {
       // 시작: '게임 시작'을 누르면 나옴
       opening: {
         doneLabel: "퇴근하러 가기 (Enter)",
         panels: [
-          { img: "story_open", lines: ["오후 6시. 퇴근할 시간이다. 가방을 들었다.", "메일 알림이 울렸다."] },
-          { img: "story_gift", lines: ["오늘은 딸의 여섯 번째 생일이다.", "작년에도, 재작년에도 늦었다."] },
-          { img: "story_promise", lines: ["\"촛불은 아빠가 와야 불 거야.\"", "오늘은 꼭 간다."] },
+          { img: "story_open", lines: ["오후 6시. 퇴근할 시간이다.", "오늘 밤 12시엔 결승전이 있다. 치킨도 예약해 뒀다."] },
+          { img: "story_stare", lines: ["김 과장이 일어났다.", "사무실의 모든 눈이 그를 향했다."] },
           { img: "story_noelev", lines: ["엘리베이터는 마침 정기 점검 중이었다.", "계단으로 간다. 다섯 층만 내려가면 된다."] },
         ],
       },
       // 비상계단 문: 층 보스를 잡고 계단으로 내려갈 때 나옴. 위에서부터 5층→4층, 4층→3층, 3층→2층, 2층→1층
-      //   내려가다 휴대폰이 울리면(phone) 화면을 눌러 딸의 문자를 봄. 휴대폰을 넣으면 남은 계단을 내려가고, Enter 로 아래층
+      //   내려가다 휴대폰이 울리면(phone) 화면을 눌러 문자(회사 단톡방, 치킨집, 친구)를 봄. 휴대폰을 넣으면 남은 계단을 내려가고, Enter 로 아래층
       stairs: [
         { doneLabel: "4층으로 (Enter)", panels: [
           { img: "story_stairs", walk: true, sign: "5F → 4F", lines: ["비상계단으로 내려간다."],
-            phone: { ring: "문자가 왔다.", notice: "새 메시지", chat: [{ text: "아빠 언제 와?" }, { text: "금방 가.", me: true }] } }] },
+            phone: { from: "회사 단톡방", avatar: "avatar_group", ring: "주머니 속 휴대폰이 울린다.", notice: "새 메시지 3개",
+                     chat: [{ from: "부장님", text: "다들 아직 회사지? ^^" }, { from: "옆 팀 팀장", text: "네!" }, { from: "인사팀장", text: "네 부장님" }],
+                     after: ["아무도 집에 못 갔다."] } }] },
         { doneLabel: "3층으로 (Enter)", panels: [
           { img: "story_stairs", walk: true, sign: "4F → 3F", lines: ["한 층 더."],
-            phone: { ring: "주머니 속 휴대폰이 떨린다.", notice: "부재중 전화 2통", chat: [{ missed: true }, { missed: true }], after: ["회의 중이라 받지 못했다."] } }] },
+            phone: { from: "치킨집", avatar: "avatar_chicken", ring: "휴대폰이 울린다.", notice: "예약 확인",
+                     chat: [{ text: "예약 확인: 밤 11시 50분 도착 예정입니다." }] } }] },
         { doneLabel: "2층으로 (Enter)", panels: [
           { img: "story_stairs", walk: true, sign: "3F → 2F", lines: ["다리가 후들거린다."],
-            phone: { ring: "문자가 왔다.", notice: "새 메시지 2개", chat: [{ text: "케이크 꺼내 놨어." }, { text: "촛불은 아직 안 켰어." }] } }] },
+            phone: { from: "친구", avatar: "avatar_friend", ring: "또 울린다.", notice: "새 메시지",
+                     chat: [{ text: "결승 같이 보는 거지? 너 또 야근이냐?" }, { text: "가는 중.", me: true }] } }] },
         { doneLabel: "1층으로 (Enter)", panels: [
           { img: "story_stairs", walk: true, sign: "2F → 1F", lines: ["마지막 계단이다."],
-            phone: { ring: "문자가 왔다.", notice: "새 메시지", chat: [{ text: "아빠, 나 졸려." }], after: ["1층이다. 이 문만 나서면 된다."] } }] },
+            phone: { from: "회사 단톡방", avatar: "avatar_group", ring: "단톡방이 울린다.", notice: "새 메시지",
+                     chat: [{ from: "부장님", text: "다들 1층 로비로 모여 ^^ 한잔하자" }],
+                     after: ["1층이다. 불이 꺼져 있다."] } }] },
       ],
       // 게임오버: 체력이 0이 되면 나옴. 죽은 이유마다 다름 (regular = 일반 적에게, bosses = 층 보스가 나와 있을 때. 위에서부터 5층~1층 순서). 끝나면 결과 창
       gameover: {
@@ -4728,7 +4742,7 @@
         bosses: [
           { doneLabel: "결과 보기 (Enter)", panels: [{ img: "story_over_5f", lines: ["\"이것만\" 이 열 개가 됐다.", "옆 팀 일을 새벽까지 봐 줬다."] }] },
           { doneLabel: "결과 보기 (Enter)", panels: [{ img: "story_over_4f", lines: ["회의는 끝나지 않았다.", "안건 12번에서 눈을 떴다. 새벽 2시."] }] },
-          { doneLabel: "결과 보기 (Enter)", panels: [{ img: "story_over_3f", lines: ["면담은 길었다.", "\"평가에 반영하겠습니다.\" 딸 생일 이야기는 꺼내지 못했다."] }] },
+          { doneLabel: "결과 보기 (Enter)", panels: [{ img: "story_over_3f", lines: ["면담은 길었다.", "\"평가에 반영하겠습니다.\" 결승전 이야기는 꺼내지 못했다."] }] },
           { doneLabel: "결과 보기 (Enter)", panels: [{ img: "story_over_2f", lines: ["영수증 한 장을 찾다 밤이 샜다.", "찾았을 땐 이미 자정이었다."] }] },
           { doneLabel: "결과 보기 (Enter)", panels: [{ img: "story_over_1f", lines: ["\"한 잔만\" 이 세 병이 됐다.", "휴대폰이 계속 울렸다. 받지 못했다."] }] },
         ],
@@ -4738,17 +4752,17 @@
         good: {
           doneLabel: "집에 왔다 (Enter)",
           panels: [
-            { img: "story_end1", lines: [`${BOSS_TYPE.name}: "...나도 우리 애 생일을 세 번 놓쳤지."`, `"${BOSS_DEFEAT_LINE}"`] },
-            { img: "story_clear", lines: ["지하철 창가. 가방을 꼭 안았다."] },
-            { img: "story_home_good", lines: ["문을 열자마자 아이가 달려와 안겼다.", "\"촛불은 아빠가 와야 분다고 했잖아.\" 같이 불었다."] },
+            { img: "story_end1", lines: [`${BOSS_TYPE.name}: "...자네가 먼저 가길 12년 기다렸네."`, `"${BOSS_DEFEAT_LINE}"`] },
+            { img: "story_exodus", lines: ["30초 만에 건물이 텅 비었다.", "다들 누가 먼저 가기만 기다리고 있었다."] },
+            { img: "story_home_chicken", lines: ["경기 시작 5분 전. 치킨도 막 도착했다.", "퇴근 완료."] },
           ],
         },
         normal: {
           doneLabel: "집에 왔다 (Enter)",
           panels: [
-            { img: "story_end1", lines: [`${BOSS_TYPE.name}: "...나도 우리 애 생일을 세 번 놓쳤지."`, `"${BOSS_DEFEAT_LINE}"`] },
-            { img: "story_clear", lines: ["지하철 창가. 가방을 꼭 안았다."] },
-            { img: "story_home", lines: ["밤 11시 50분. 식탁에서 졸던 아이를 깨웠다.", "\"아빠 왔어. 같이 촛불 불자.\""] },
+            { img: "story_end1", lines: [`${BOSS_TYPE.name}: "...자네가 먼저 가길 12년 기다렸네."`, `"${BOSS_DEFEAT_LINE}"`] },
+            { img: "story_exodus", lines: ["30초 만에 건물이 텅 비었다.", "다들 누가 먼저 가기만 기다리고 있었다."] },
+            { img: "story_home_cold", lines: ["전반전이 끝나 있었다. 치킨은 식었다.", "그래도, 퇴근은 퇴근이다."] },
           ],
         },
       },
@@ -4835,14 +4849,14 @@
       const p = cutscenePhone;
       p.stage = "buzz";
       const name = document.createElement("b");
-      name.textContent = PHONE_CONTACT;
+      name.textContent = p.phone.from;
       const what = document.createElement("span");
       what.textContent = p.phone.notice;
       const text = document.createElement("div");
       text.append(name, what);
       const notice = document.createElement("div");
       notice.className = "ph-notice";
-      notice.append(phoneAvatar(), text);
+      notice.append(phoneAvatar(p.phone.avatar), text);
       cutscenePhoneScreen.replaceChildren(notice);
       cutsceneBox.classList.add("phone-buzz");
       showCutsceneLines([p.phone.ring]);
@@ -4857,16 +4871,22 @@
       p.stage = "read";
       stopPhoneBuzz();
       const name = document.createElement("b");
-      name.textContent = PHONE_CONTACT;
+      name.textContent = p.phone.from;
       const head = document.createElement("div");
       head.className = "ph-head";
-      head.append(phoneAvatar(), name);
+      head.append(phoneAvatar(p.phone.avatar), name);
       const chat = document.createElement("div");
       chat.className = "ph-chat";
       p.phone.chat.forEach((message, i) => {
         const bubble = document.createElement("div");
         bubble.className = message.missed ? "ph-bubble missed" : message.me ? "ph-bubble me" : "ph-bubble";
-        bubble.textContent = message.missed ? PHONE_MISSED_TEXT : message.text;
+        if (message.from) {                            // 단톡방: 말풍선 위에 보낸 사람 이름
+          const who = document.createElement("small");
+          who.className = "ph-from";
+          who.textContent = message.from;
+          bubble.append(who);
+        }
+        bubble.append(message.missed ? PHONE_MISSED_TEXT : message.text);
         bubble.style.animationDelay = `${(i + 1) * PHONE_BUBBLE_DELAY}s`;
         chat.append(bubble);
       });
@@ -4890,11 +4910,11 @@
       walkStairs(STAIRS_PHONE_STEP * 2, STAIRS_WALK_STEPS * 2, () => {});   // 다 내려가면 그대로 기다림 (Enter 로 아래층)
     }
 
-    // 문자를 보낸 사람의 동그란 사진
-    function phoneAvatar() {
+    // 보낸 곳의 동그란 사진 (name = assets/office 의 그림 이름)
+    function phoneAvatar(name) {
       const img = document.createElement("img");
       img.className = "ph-avatar";
-      img.src = assetUrl(PHONE_AVATAR);
+      img.src = assetUrl(`office/${name}.png`);
       img.alt = "";
       return img;
     }
@@ -4992,20 +5012,27 @@
     cutsceneBox.addEventListener("click", advanceCutscene);   // 화면 아무 곳이나 눌러도 다음 (버튼도 이 안에 있어서 같이 처리됨)
 
     // =====================================================================
-    // 15-2. 보스 등장 연출: 층 보스나 부장님이 나타나는 순간 게임을 잠깐 멈추고 큰 그림·이름·대사를 보여 줌
-    //   spawnFloorBoss / spawnBoss 가 부름. 연출이 끝나면 게임이 저절로 이어짐
+    // 15-2. 보스 연출: 층 보스나 부장님이 나타날 때(보스 등장, 김 과장의 대답까지)와 층 보스가 쓰러질 때(보스 퇴근) 게임을 잠깐 멈추고 큰 그림·이름·대사를 보여 줌
+    //   spawnFloorBoss / spawnBoss / floorBossDefeated 가 부름. 연출이 끝나면 게임이 저절로 이어짐
     // =====================================================================
-    const BOSS_INTRO_TIME = 2.4;                           // 연출이 보이는 시간 (초). 이 시간이 지나면 서서히 사라짐
+    const BOSS_INTRO_TIME = 3.4;                           // 등장 연출이 보이는 시간 (초). 이 시간이 지나면 서서히 사라짐 (김 과장의 대답까지 읽게 2.4 → 3.4)
+    const BOSS_REPLY_DELAY = 1.2;                          // 등장 연출에서 김 과장의 대답이 나오는 때 (초)
+    const BOSS_OUTRO_TIME = 2.4;                           // 층 보스가 쓰러질 때 연출("보스 퇴근")이 보이는 시간 (초)
     const BOSS_INTRO_SKIP_KEYS = ["enter", " ", "escape"]; // 연출을 건너뛰는 키 (" " = Space)
     const CUTIN_NAMES = [...FLOORS.filter((f) => f.boss).map((f) => f.boss.cutin), BOSS_CUTIN];
     // 큰 그림을 미리 불러 둠 (연출이 시작될 때 그림이 늦게 뜨지 않게)
     for (const name of CUTIN_NAMES) { const img = new Image(); img.src = assetUrl(`office/${name}.png`); }
 
-    function showBossIntro(name, line, cutin) {
+    // reply = 김 과장의 대답 (등장할 때),  outro = true 면 쓰러질 때 연출 ("보스 퇴근" 딱지, 대답 없음)
+    function showBossIntro(name, line, cutin, reply = "", outro = false) {
+      bossIntroTag.textContent = outro ? "보스 퇴근" : "보스 등장";
       bossIntroName.textContent = name;
       bossIntroLine.textContent = `"${line}"`;
+      bossIntroReply.textContent = reply ? `김 과장: "${reply}"` : "";
       bossIntroImg.src = assetUrl(`office/${cutin}.png`);
-      bossIntroBox.style.setProperty("--bi-hold", `${BOSS_INTRO_TIME}s`);
+      bossIntroBox.classList.toggle("outro", outro);
+      bossIntroBox.style.setProperty("--bi-hold", `${outro ? BOSS_OUTRO_TIME : BOSS_INTRO_TIME}s`);
+      bossIntroBox.style.setProperty("--bi-reply-delay", `${BOSS_REPLY_DELAY}s`);
       bossIntroBox.style.display = "none";            // 연출을 처음부터 다시 틀기 위해 한 번 껐다 켬
       void bossIntroBox.offsetWidth;
       bossIntroBox.style.display = "block";
