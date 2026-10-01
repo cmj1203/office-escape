@@ -301,3 +301,19 @@ four edges. Dark and muted so that characters drawn on top stand out. Square ima
 후처리: `tools/process_sprites.py` 가 `phone_` 이름은 정사각형으로 채우지 않고 비율 그대로 긴 쪽 768픽셀로 줄인다 (화면에 크게 나오므로). phone_hand.png 는 654 × 768.
 
 쓰지 않게 된 그림: 계단 이야기 그림 story_stair1~4 (14장) 는 휴대폰 장면으로 바뀌어 `assets/office/_old/` 로 옮겼다.
+
+## 20. 스토리 A 그림 (2026-10-01 추가)
+
+스토리를 "눈치 게임"으로 바꾸며 만든 그림이다. 장면은 14장의 공통 문장(SCENE), 아이콘은 스프라이트 공통 문장(SPRITE_HEAD, 물건은 ITEM 문장 추가)을 앞에 붙였다. 둘 다 `.omo/gpt_helpers.mjs` 에 들어 있다.
+
+| 쓰는 곳 | 파일 | 주제 문장 (요약) |
+|---|---|---|
+| 시작 2 | story_stare.png | 저녁 6시 사무실. 가방을 들고 일어선 김 과장(식은땀 한 방울)을 주변 동료 모두가 같은 순간 고개를 돌려 동그란 눈으로 쳐다봄 |
+| 결말 2 | story_exodus.png | 밤, 회사 건물 회전문으로 사람들이 우르르 쏟아져 나오며 환호, 종이가 날리고 창문 불이 층마다 꺼져 감. 맨 앞에서 두 팔을 든 부장님(대머리, 둥근 안경, 파란 넥타이), 옆에서 놀라 웃는 김 과장 |
+| 결말 3 굿엔딩 | story_home_chicken.png | 작은 거실, 소파에서 닭다리를 들고 활짝 웃는 김 과장. 김이 나는 치킨 상자(무늬 없음)와 거품 맥주, TV 는 킥오프 직전 축구장(글자·점수판 없음), 벽시계는 12시 직전 |
+| 결말 3 노말엔딩 | story_home_cold.png | 같은 거실, 조금 어둡게. 식은 치킨과 김 빠진 맥주, 지친 쓴웃음, TV 는 하프타임, 벽시계는 12시 넘음 |
+| 휴대폰 사진: 회사 단톡방 | avatar_group.png | 겹친 말풍선 셋 (노랑, 흰색, 회색), 안에 점 세 개 |
+| 휴대폰 사진: 치킨집 | avatar_chicken.png | 바삭한 닭다리 하나 |
+| 휴대폰 사진: 친구 | avatar_friend.png | 거꾸로 쓴 빨간 모자, 회색 후드티, 손을 흔들며 활짝 웃는 친구 |
+
+쓰지 않게 된 그림 (`assets/office/_old/daughter-story/` 로): story_gift, story_promise, story_clear, story_home, story_home_good, avatar_kid.
